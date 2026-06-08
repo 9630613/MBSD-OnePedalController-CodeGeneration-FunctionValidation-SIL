@@ -1,12 +1,11 @@
-# 🤖 Embedded Deployment — One-Pedal Controller on Arduino (Code Generation & HIL Testing)
+#  One-Pedal Controller on Arduino (Code Generation & SIL Testing)
 
-> Continuation of the [One-Pedal Drive Controller](../one-pedal-controller) and [Functional Safety](../one-pedal-safety) projects. This phase covers **automatic C code generation** from the Simulink controller model targeting an **Arduino microcontroller**, full **electrical interface mapping**, and **Hardware-in-the-Loop (HIL) validation** using SimulIDE.
+> Continuation of the [MBSD-OnePedalController-SystemDefinition-HARA-MIL](https://github.com/9630613/MBSD-OnePedalController-SystemDefinition-HARA-MIL) and [MBSD-One-Pedal-Controller-SaftyFunction-Unit-IntegrationTest](https://github.com/9630613/MBSD-One-Pedal-Controller-SaftyFunction-Unit-IntegrationTest) projects. This phase covers **automatic C code generation** from the Simulink controller model targeting an **Arduino microcontroller**, full **electrical interface mapping**, and **Software-in-the-Loop (SIL) validation** using SimulIDE.
 
----
 
-## 📌 Project Overview
+## Project Overview
 
-This project bridges the gap between model-based design and physical embedded deployment. The complete one-pedal controller — including its functional safety layer — is compiled and flashed onto an **Arduino** board using the **Simulink Support Package for Arduino Hardware**. The electrical interfaces are designed and wired in **SimulIDE**, and the full controller functionality (including safe state) is validated through interactive hardware simulation.
+This project bridges the gap between model-based design and embedded deployment. The complete one-pedal controller — including its functional safety layer — is compiled and flashed onto simulID using the **Simulink Support Package for Arduino Hardware**. The electrical interfaces are designed and wired in **SimulIDE**, and the full controller functionality (including safe state) is validated through interactive hardware simulation.
 
 Key contributions:
 - Mapping of all controller signals to Arduino physical pins (digital, analog, PWM)
@@ -16,11 +15,10 @@ Key contributions:
 - SimulIDE harness design for interactive real-time testing
 - Full functional test coverage including normal operation modes and safe state activation
 
----
 
-## 🔌 I/O Interface Design
+## I/O Interface Design
 
-All controller signals from the Simulink model are mapped to physical Arduino electrical interfaces. The table below summarizes the complete I/O mapping with conversion formulas and signal ranges.
+All controller signals from the Simulink model are mapped to Arduino electrical interfaces. The table below summarizes the complete I/O mapping with conversion formulas and signal ranges.
 
 ### Interface Table
 
@@ -36,11 +34,10 @@ All controller signals from the Simulink model are mapped to physical Arduino el
 | Transmission State Output (R, B, P, N, D) | — | Digital Output (DO) × 5 | — | 0 | 1 |
 | Safety Warning Lamp | — | Digital Output (DO) | — | 0 | 1 |
 
-> 📷 *See `/images/controller_model_codegen.png` for the annotated controller model ready for code generation.*
+<img width="2516" height="914" alt="image" src="https://github.com/user-attachments/assets/aab82d6b-595f-4e4a-a262-9f5cd512a5b6" />
 
----
 
-## ⚙️ Signal Conversion Details
+## Signal Conversion Details
 
 ### Analog Inputs — ADC Formula
 
@@ -72,8 +69,6 @@ Identical formula to the primary throttle pedal:
 RedundantPosition = ADC_output × (5 / 1023) × (1 / 5)
 ```
 
----
-
 ### PWM Output — Requested Torque
 
 The torque output spans a **signed range [−80, +80] N·m**, which is encoded into the **unsigned 8-bit PWM range [0, 255]**:
@@ -90,7 +85,6 @@ PWM_value = (TorqueRequest_Nm + 80) × (255 / 160)
 
 > A **50% duty cycle** represents zero torque. Values above 50% drive the motor forward; values below 50% command regenerative braking. This is visible in SimulIDE using an oscilloscope on the PWM output pin.
 
----
 
 ### Transmission Selector — Enum ↔ Digital Pins
 
@@ -102,11 +96,20 @@ Each digital pin corresponds to one selector state. The active pin sets the enum
 #### Output side (enum → 5 DO pins):
 The controller's current `AutoTransmissionState` enum is decoded back to 5 individual digital output pins, driving 5 LEDs on the SimulIDE harness to indicate the active mode visually.
 
-> 📷 *See `/images/selector_input_stateflow.png` and `/images/selector_output_stateflow.png` for the internal Stateflow encoding logic.*
+<p align="center">
+   <img width="350" height="350" alt="image" src="https://github.com/user-attachments/assets/ca4adb39-7a58-4bb9-80bb-96e6b1515431" /> <img width="600" height="350" alt="image" src="https://github.com/user-attachments/assets/37af8b91-9efe-4bf5-88cf-bbc732948246" />
+     <br>
+     <em> Input Selector State Model </em>
+</p>
 
----
+<p align="center"> 
+<img width="350" height="350" alt="image" src="https://github.com/user-attachments/assets/2b1b2e59-9b4b-4bfa-bf75-3125362714e8" /> <img width="600" height="350" alt="image" src="https://github.com/user-attachments/assets/84c03a51-453f-4349-bf53-2e7ae99c2fec" />
+     <br>
+     <em> Output Selector State Model </em>
+</p>
+     
 
-## 🔧 Code Generation for Arduino
+## Code Generation for Arduino
 
 ### Steps to Generate Firmware
 
@@ -125,11 +128,14 @@ The controller's current `AutoTransmissionState` enum is decoded back to 5 indiv
 
 6. **Build and deploy** using the Simulink Support Package deploy button, which cross-compiles to AVR C and flashes via USB.
 
-> 📷 *See `/images/arduino_instrumented_model.png` for the full controller model with Arduino I/O blocks.*
+<p align="center"> 
+     <img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/5e891c66-0870-4884-bafc-1c1509251df4" />
+     <br>
+     <em> Controller Modle with Arduio Block I/O </em>
+</p>
 
----
 
-## 🧪 SimulIDE Harness
+## SimulIDE Harness
 
 The hardware circuit was designed and simulated in **SimulIDE**, replicating the Arduino's physical connections:
 
@@ -142,11 +148,14 @@ The hardware circuit was designed and simulated in **SimulIDE**, replicating the
 | LEDs (with resistors) | Digital outputs: active transmission state (×5), safety warning lamp |
 | Oscilloscope | Visualizing PWM duty cycle of the torque output signal |
 
-> 📷 *See `/images/simulide_harness.png` for the complete wired harness.*
+<p align="center"> 
+     <img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/cf42fa62-2d87-4ecf-b4f7-e33967568533" />
+     <br>
+     <em> Harness Implementation in SimulID </em>
+</p>
 
----
 
-## ✅ Functional Test Scenarios
+## Functional Test Scenarios
 
 All test scenarios were executed interactively in SimulIDE, manually applying stimuli through the harness components. The following sequence was validated:
 
@@ -168,7 +177,6 @@ All test scenarios were executed interactively in SimulIDE, manually applying st
 
 > 📷 *See `/images/test_state_transitions.png` for simulation captures of each transition.*
 
----
 
 ### Test Scenario 2 — Safe State Activation (CAN Disconnection)
 
@@ -181,17 +189,17 @@ All test scenarios were executed interactively in SimulIDE, manually applying st
 - `TorqueRequest_Nm` → **0** (PWM duty cycle → **~50%**)
 - `SafeStateAlarm` → **ON** (warning LED)
 
-**Result:** ✅ Immediately upon CAN disconnection signal, the oscilloscope shows PWM dropping to 50% duty cycle and the transmission state LED switches to Neutral.
+**Result:** Immediately upon CAN disconnection signal, the oscilloscope shows PWM dropping to 50% duty cycle and the transmission state LED switches to Neutral.
 
 > 📷 *See `/images/safe_state_can_test.png` for oscilloscope capture before and after CAN disconnection.*
 
----
+
 
 ### Test Scenario 3 — Safe State Activation (Pedal Sensor Error)
 
 **Note:** In SimulIDE it is not possible to change two potentiometers simultaneously to generate a realistic differential error between the primary and redundant pedal sensors. This scenario was verified at the model level (Simulink simulation) rather than in the physical harness. The CAN disconnection test above confirms the safe state logic path is correctly wired in hardware.
 
----
+
 
 ### Test Scenario 4 — PWM Torque Encoding Verification
 
@@ -206,7 +214,7 @@ The requested torque is encoded as PWM with 50% duty cycle = 0 N·m. This was va
 
 ---
 
-## ⚠️ Implementation Notes & Limitations
+##  Implementation Notes & Limitations
 
 - **Warning Lamp pin:** The safety alarm LED could not be implemented on the Arduino Uno in this configuration because all available digital output pins were already allocated to transmission state indicators and other outputs. The alarm signal is present in the model but not connected to a physical pin.
 
@@ -216,36 +224,16 @@ The requested torque is encoded as PWM with 50% duty cycle = 0 N·m. This was va
 
 ---
 
-## 🔗 Project Series
+## Project Series
 
 This is the **third and final project** in the one-pedal drive series:
 
 | Project | Focus |
 |---------|-------|
-| [One-Pedal Controller](../one-pedal-controller) | FSM-based controller design in Simulink/Stateflow |
-| [Functional Safety Concept](../one-pedal-safety) | ISO 26262 HARA, safety goals, Safety Function implementation |
+| [MBSD-OnePedalController-SystemDefinition-HARA-MIL](https://github.com/9630613/MBSD-OnePedalController-SystemDefinition-HARA-MIL) | FSM-based controller design in Simulink/Stateflow |
+| [MBSD-One-Pedal-Controller-SaftyFunction-Unit-IntegrationTest](https://github.com/9630613/MBSD-One-Pedal-Controller-SaftyFunction-Unit-IntegrationTest) | ISO 26262 HARA, safety goals, Safety Function implementation |
 | **This project** | Code generation for Arduino, electrical interface mapping, HIL testing in SimulIDE |
 
----
-
-## 📁 Repository Structure
-
-```
-├── Controller_Arduino.slx         # ← Controller with Arduino I/O blocks (original)
-├── init_fn.m                      # Model initialization parameters
-├── images/
-│   ├── controller_model_codegen.png      # Simulink model ready for code gen
-│   ├── selector_input_stateflow.png      # DI → enum Stateflow logic
-│   ├── selector_output_stateflow.png     # enum → DO Stateflow logic
-│   ├── arduino_instrumented_model.png    # Full model with Arduino blocks
-│   ├── simulide_harness.png              # SimulIDE wiring diagram
-│   ├── test_state_transitions.png        # Normal mode transition captures
-│   ├── safe_state_can_test.png           # Oscilloscope: safe state activation
-│   └── pwm_torque_verification.png       # PWM duty cycle vs torque table
-└── README.md
-```
-
----
 
 ## 🛠️ Tools & Technologies
 
@@ -254,18 +242,6 @@ This is the **third and final project** in the one-pedal drive series:
 | **MATLAB / Simulink** | Controller model, code generation configuration |
 | **Stateflow** | Enum ↔ digital pin encoding/decoding logic |
 | **Simulink Support Package for Arduino Hardware** | AVR C code generation and deployment |
-| **Arduino Uno** | Target microcontroller (10-bit ADC, PWM, DI/DO) |
 | **SimulIDE** | Electronic circuit simulation for HIL testing |
 
----
 
-## 👩‍💻 Author
-
-**Zahra Sadeghi Jalalabadi** — s329869
-Model-Based Software Design — A.Y. 2023/24
-
----
-
-## 📄 License
-
-Developed as part of academic coursework. Controller adaptation for Arduino, interface conversion design, SimulIDE harness, and all test scenarios are original work. The base controller model and plant were developed in the preceding projects of this series.
