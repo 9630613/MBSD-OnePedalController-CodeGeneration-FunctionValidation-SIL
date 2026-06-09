@@ -5,7 +5,7 @@
 
 ## Project Overview
 
-This project bridges the gap between model-based design and embedded deployment. The complete one-pedal controller — including its functional safety layer — is compiled and flashed onto simulID using the **Simulink Support Package for Arduino Hardware**. The electrical interfaces are designed and wired in **SimulIDE**, and the full controller functionality (including safe state) is validated through interactive hardware simulation.
+This project bridges the gap between model-based design and embedded deployment. The complete one-pedal controller — including its functional safety layer — is compiled and flashed onto simulIDE using the **Simulink Support Package for Arduino Hardware**. The electrical interfaces are designed and wired in **SimulIDE**, and the full controller functionality (including safe state) is validated through interactive hardware simulation.
 
 Key contributions:
 - Mapping of all controller signals to Arduino physical pins (digital, analog, PWM)
@@ -151,7 +151,7 @@ The hardware circuit was designed and simulated in **SimulIDE**, replicating the
 <p align="center"> 
      <img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/cf42fa62-2d87-4ecf-b4f7-e33967568533" />
      <br>
-     <em> Harness Implementation in SimulID </em>
+     <em> Harness Implementation in SimulIDE </em>
 </p>
 
 
@@ -175,7 +175,7 @@ All test scenarios were executed interactively in SimulIDE, manually applying st
 | 10 | Decrease velocity < 5 km/h, select Reverse | Transitions to **Reverse** | ✅ |
 | 11 | Select Park (velocity < 5 km/h) | Transitions to **Park** | ✅ |
 
-> 📷 *See `/images/test_state_transitions.png` for simulation captures of each transition.*
+
 
 
 ### Test Scenario 2 — Safe State Activation (CAN Disconnection)
@@ -191,17 +191,20 @@ All test scenarios were executed interactively in SimulIDE, manually applying st
 
 **Result:** Immediately upon CAN disconnection signal, the oscilloscope shows PWM dropping to 50% duty cycle and the transmission state LED switches to Neutral.
 
-> 📷 *See `/images/safe_state_can_test.png` for oscilloscope capture before and after CAN disconnection.*
 
+<p align="center"> 
+     <img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/1b36d56e-406d-46f5-8337-048ad3a86fff" />
+     <br>
+     <em> Drive mode with High speed </em>
+</p>
 
+<p align="center"> 
+     <img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/a00d4724-1108-4124-96a7-5ff5224eae5c" />
+     <br>
+     <em> Safe State Activation_CANDisconnection error </em>
+</p>
 
-### Test Scenario 3 — Safe State Activation (Pedal Sensor Error)
-
-**Note:** In SimulIDE it is not possible to change two potentiometers simultaneously to generate a realistic differential error between the primary and redundant pedal sensors. This scenario was verified at the model level (Simulink simulation) rather than in the physical harness. The CAN disconnection test above confirms the safe state logic path is correctly wired in hardware.
-
-
-
-### Test Scenario 4 — PWM Torque Encoding Verification
+### PWM Torque Encoding Verification
 
 The requested torque is encoded as PWM with 50% duty cycle = 0 N·m. This was validated visually using the SimulIDE oscilloscope:
 
@@ -222,7 +225,6 @@ The requested torque is encoded as PWM with 50% duty cycle = 0 N·m. This was va
 
 - **Vehicle speed input:** In the absence of the full physical plant in SimulIDE, vehicle speed is manually simulated with a potentiometer. This means state transition guards based on speed (e.g., entering Drive or Reverse) must be set up manually by the tester.
 
----
 
 ## Project Series
 
@@ -235,7 +237,7 @@ This is the **third and final project** in the one-pedal drive series:
 | **This project** | Code generation for Arduino, electrical interface mapping, HIL testing in SimulIDE |
 
 
-## 🛠️ Tools & Technologies
+## Tools & Technologies
 
 | Tool | Purpose |
 |------|---------|
